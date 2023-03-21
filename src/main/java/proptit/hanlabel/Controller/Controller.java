@@ -42,6 +42,10 @@ import com.itextpdf.text.pdf.PdfReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JProgressBar;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
 public class Controller {
     private static Controller instance;
@@ -75,6 +79,7 @@ public class Controller {
                         String text = bufferrun.getText(0);
                         if (text != null && text.contains(someWords.get(i))) {
                             text = text.replace(someWords.get(i), Replaced.get(i));
+                            
                             bufferrun.setText(text, 0);
                         }
                         obj.set(bufferrun.getCTR());
@@ -164,8 +169,8 @@ public class Controller {
     }
     
     public void printPDFfile(JTextField schoolF, JTextField nameF, JTextField gradeF, JCheckBox book, JCheckBox note, JProgressBar jpb) throws IOException, PrinterException, FileNotFoundException, XmlException, DocumentException{
-//        jpb.setStringPainted(true);
-//        jpb.setValue(0);
+        jpb.setStringPainted(true);
+        jpb.setValue(0);
         if(schoolF.getText().equals("")){
             MainView.pushMsg("Vui lòng nhập tên trường.");
             return;
@@ -183,7 +188,7 @@ public class Controller {
             return;
         }
         prepareDocxFile(schoolF, nameF, gradeF,book, note);
-        
+        jpb.setValue(20);
         String filePath = "output.pdf";
         try (PDDocument pdDocument = PDDocument.load(new File(folderPath + filePath))) {
             PrintService printService = PrintServiceLookup.lookupDefaultPrintService();            
@@ -196,12 +201,6 @@ public class Controller {
                 }
             }
         }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        jpb.setValue(0); 
         File file = new File(folderPath + filePath);
         file.delete();
     }
@@ -221,7 +220,7 @@ public class Controller {
         ArrayList<String> inputPaths = new ArrayList<>();
         someWords.add("SCHOOLTEMPLATE"); Replaced.add("TRƯỜNG " + schoolF.getText().trim().toUpperCase());
         someWords.add("ClassTemplate"); Replaced.add(gradeF.getText().trim().toUpperCase());
-        someWords.add("NameTeamplate"); Replaced.add(ChuanHoaXau(nameF.getText()));
+        someWords.add("NameTemplate"); Replaced.add(ChuanHoaXau(nameF.getText()));
         someWords.add("YearTemplate"); Replaced.add(getYear());
         int page = 0;
         String outputPath = "output";
@@ -242,6 +241,31 @@ public class Controller {
     }
     
     public void limitLineTextArea(JTextArea jta){
-        
+        int maxLines = 25; 
+        ((AbstractDocument) jta.getDocument()).setDocumentFilter(new DocumentFilter() {
+            @Override
+            public void insertString(DocumentFilter.FilterBypass fb, int offs, String str, AttributeSet a) throws BadLocationException {
+                // Nếu số dòng hiện tại của JTextArea đã vượt quá giới hạn, không cho phép thêm ký tự mới vào
+                if (jta.getLineCount() >= maxLines) {
+                    MainView.pushMsg("Bạn đã được nhập đủ 24 nhãn vở");
+                    return;
+                }
+
+                // Nếu số dòng chưa vượt quá giới hạn, cho phép thêm ký tự mới vào
+                super.insertString(fb, offs, str, a);
+            }
+
+            @Override
+            public void replace(DocumentFilter.FilterBypass fb, int offs, int length, String str, AttributeSet a) throws BadLocationException {
+                // Nếu số dòng hiện tại của JTextArea đã vượt quá giới hạn, không cho phép thay thế ký tự
+                if (jta.getLineCount() >= maxLines) {
+                    MainView.pushMsg("Bạn đã được nhập đủ 24 nhãn vở");
+                    return;
+                }
+
+                // Nếu số dòng chưa vượt quá giới hạn, cho phép thay thế ký tự
+                super.replace(fb, offs, length, str, a);
+            }
+        });
     }
 }
