@@ -39,7 +39,16 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfCopy;
 import com.itextpdf.text.pdf.PdfReader;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+import javax.swing.border.Border;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -49,7 +58,9 @@ public class Controller {
     private static Controller instance;
     private final String folderPath = "D:\\App\\HanLabel\\target\\";
     //private final String folderPath = "";
-    
+    private ArrayList<JLabel> jLabels = new ArrayList<>();
+    private String bookPath;
+    private String notePath;
     private Controller(){
         
     }
@@ -129,7 +140,6 @@ public class Controller {
             String line;
             while((line = bufferedReader.readLine()) != null){
                 listNote += line + "\n";
-                System.out.println(line);
             }
         }
         return listNote;
@@ -145,7 +155,7 @@ public class Controller {
     }
     
     public void convertDocxToPdf(ArrayList <String> inputPaths, String outputPath) throws FileNotFoundException, IOException, DocumentException{
-        String tempPath = "temp.pdf";
+        String tempPath = folderPath + "temp.pdf";
         Document document = new Document();
         PdfCopy copy = new PdfCopy(document, new FileOutputStream(outputPath));
         document.open();
@@ -166,9 +176,65 @@ public class Controller {
         }
     }
     
-    public void printPDFfile(JTextField schoolF, JTextField nameF, JTextField gradeF, JCheckBox book, JCheckBox note, JProgressBar jpb) throws IOException, PrinterException, FileNotFoundException, XmlException, DocumentException{
+    public Boolean exceptionHandling(JTextField schoolF, JTextField gradeF){
+        String school = schoolF.getText();
+        String grade = gradeF.getText();
+        Boolean check = false;
+        if(school.length() < 4){
+            MainView.pushMsg("Bạn đã nhập sai tên trường.");
+            return false;
+        }
+        if(grade.length() < 1){
+            MainView.pushMsg("Bạn đã nhập sai lớp.");
+            return false;
+        }
+        if(school.substring(0, 4).toUpperCase().equals("THPT")){
+            check = true;
+            if(grade.length() < 2){
+                MainView.pushMsg("Bạn đã nhập sai lớp.");
+                return false;
+            }
+            if(Character.isAlphabetic(grade.charAt(1)) || Character.isAlphabetic(grade.charAt(0))){
+                MainView.pushMsg("Bạn đã nhập sai lớp.");
+                return false;
+            }
+            int tmp = Integer.parseInt(grade.substring(0, 2));
+            if(tmp < 10 || tmp > 12){
+                MainView.pushMsg("Cấp bậc THPT chỉ có lớp 10, 11, 12.");
+                return false;
+            }
+        }
+        else if(school.substring(0, 4).toUpperCase().equals("THCS")){
+            check = true;
+            if(Character.isAlphabetic(grade.charAt(0))){
+                MainView.pushMsg("Bạn đã nhập sai lớp.");
+                return false;
+            }
+            int tmp = Integer.parseInt(grade.substring(0, 1));
+            if(tmp < 6 || tmp > 9){
+                MainView.pushMsg("Cấp bậc THCS chỉ có lớp 6, 7, 8, 9.");
+                return false;
+            }
+        }
+        else if(school.substring(0, 2).toUpperCase().equals("TH")){
+            check = true;
+            if(Character.isAlphabetic(grade.charAt(0))){
+                MainView.pushMsg("Bạn đã nhập sai lớp.");
+                return false;
+            }
+            int tmp = Integer.parseInt(grade.substring(0, 1));
+            if(tmp < 1 || tmp > 5){
+                MainView.pushMsg("Cấp bậc TH chỉ có lớp 1, 2, 3, 4, 5.");
+                return false;
+            }
+        }
+        return check;
+    }
+    
+    public void printPDFfile(JTextField schoolF, JTextField nameF, JTextField gradeF, JCheckBox book, JCheckBox note, JProgressBar jpb, JTextArea jta) throws IOException, PrinterException, FileNotFoundException, XmlException, DocumentException, InterruptedException{
+        MainView.pushMsg(bookPath);
         jpb.setStringPainted(true);
-        jpb.setValue(0);
+        jpb.setValue(30);
         if(schoolF.getText().equals("")){
             MainView.pushMsg("Vui lòng nhập tên trường.");
             return;
@@ -185,8 +251,8 @@ public class Controller {
             MainView.pushMsg("Vui lòng chọn loại nhãn để in.");
             return;
         }
-        prepareDocxFile(schoolF, nameF, gradeF,book, note);
-        jpb.setValue(20);
+        if(exceptionHandling(schoolF, gradeF) == false) return;
+        prepareDocxFile(schoolF, nameF, gradeF,book, note, jta,jpb);
         String filePath = "output.pdf";
         try (PDDocument pdDocument = PDDocument.load(new File(folderPath + filePath))) {
             PrintService printService = PrintServiceLookup.lookupDefaultPrintService();            
@@ -199,8 +265,6 @@ public class Controller {
                 }
             }
         }
-        File file = new File(folderPath + filePath);
-        file.delete();
     }
     
     public String ChuanHoaXau(String s){
@@ -212,7 +276,7 @@ public class Controller {
         return ans.trim();
     }
     
-    public void prepareDocxFile(JTextField schoolF, JTextField nameF, JTextField gradeF, JCheckBox book, JCheckBox note) throws IOException, FileNotFoundException, XmlException, DocumentException{        
+    public void prepareDocxFile(JTextField schoolF, JTextField nameF, JTextField gradeF, JCheckBox book, JCheckBox note, JTextArea jta, JProgressBar jpb) throws IOException, FileNotFoundException, XmlException, DocumentException{        
         ArrayList<String> someWords = new ArrayList<>();
         ArrayList<String> Replaced = new ArrayList<>();
         ArrayList<String> inputPaths = new ArrayList<>();
@@ -220,22 +284,30 @@ public class Controller {
         someWords.add("ClassTemplate"); Replaced.add(gradeF.getText().trim().toUpperCase());
         someWords.add("NameTemplate"); Replaced.add(ChuanHoaXau(nameF.getText()));
         someWords.add("YearTemplate"); Replaced.add(getYear());
-        int page = 0;
-        String outputPath = "output";
         if(book.isSelected()){
-            page++;
-            replaceText(someWords, Replaced, "book.docx",outputPath + String.format("%d", page) + ".docx");
+            replaceText(someWords, Replaced, bookPath,"output1.docx");
             inputPaths.add(folderPath + "output1.docx");
         }
         if (note.isSelected()){
-            
+            String[] noteList = jta.getText().split("\n");
+            for(int i = 1;i <= 24;i++){
+                if(i <= noteList.length){
+                    someWords.add("SubjectTemplate" + String.format("%02d", i));
+                    Replaced.add(noteList[i - 1]);
+                }
+                else{
+                    someWords.add("SubjectTemplate" + String.format("%02d", i));
+                    Replaced.add("");
+                }
+            }
+            replaceText(someWords, Replaced, "notebook.docx", "output2.docx");
+            inputPaths.add(folderPath + "output2.docx");
         }
         convertDocxToPdf(inputPaths, folderPath + "output.pdf");
     }
     
     public void delTextArea(JTextArea jta){
         jta.setText("");
-        jta.setEditable(true);
     }
     
     public void limitLineTextArea(JTextArea jta){
@@ -243,27 +315,47 @@ public class Controller {
         ((AbstractDocument) jta.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
             public void insertString(DocumentFilter.FilterBypass fb, int offs, String str, AttributeSet a) throws BadLocationException {
-                // Nếu số dòng hiện tại của JTextArea đã vượt quá giới hạn, không cho phép thêm ký tự mới vào
                 if (jta.getLineCount() >= maxLines) {
                     MainView.pushMsg("Bạn đã được nhập đủ 24 nhãn vở");
                     return;
                 }
-
-                // Nếu số dòng chưa vượt quá giới hạn, cho phép thêm ký tự mới vào
                 super.insertString(fb, offs, str, a);
             }
 
             @Override
             public void replace(DocumentFilter.FilterBypass fb, int offs, int length, String str, AttributeSet a) throws BadLocationException {
-                // Nếu số dòng hiện tại của JTextArea đã vượt quá giới hạn, không cho phép thay thế ký tự
                 if (jta.getLineCount() >= maxLines) {
                     MainView.pushMsg("Bạn đã được nhập đủ 24 nhãn vở");
                     return;
                 }
-
-                // Nếu số dòng chưa vượt quá giới hạn, cho phép thay thế ký tự
                 super.replace(fb, offs, length, str, a);
             }
         });
+    }
+    
+    public void addLabel(JLabel jl){   
+        int d = jLabels.size() + 1;
+        ImageIcon img = new ImageIcon(folderPath + "label_" + String.format("%d", d) + ".png");
+        Image image = img.getImage();
+        Image scaledImage = image.getScaledInstance(jl.getWidth(), jl.getHeight(), Image.SCALE_SMOOTH);
+        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+        jl.setIcon(scaledIcon);
+        Border defaultBorder = BorderFactory.createLineBorder(Color.BLACK, 1); // Đường viền mặc định
+        Border clickedBorder = BorderFactory.createLineBorder(Color.RED, 2);
+        jl.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int k = 0;
+                for(JLabel tmp : jLabels){
+                    k++;
+                    if(tmp == jl){
+                        bookPath = "book_" + String.format("%d", k) + ".docx";
+                    }
+                    tmp.setBorder(defaultBorder);
+                }
+                jl.setBorder(clickedBorder); // Thiết lập đường viền khi click
+            }
+        });
+        jLabels.add(jl);
     }
 }

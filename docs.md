@@ -1,8 +1,17 @@
 # HanLabel
 
+Ngày 22/03/2023
+Các tính năng đã phát triển thêm :
+- In nhãn vở (70%)
+- Đã thay đổi được template cho nhãn vở ( tạm thời chỉ mới có 2 mẫu nhãn vở <sẽ cập nhật thêm>) (80%)
+
+Các tính năng sẽ phát triển sắp tới :
+- Hiện PrintPreview
+- Hiện bảng thông báo đang thực hiện chương trình
+
 Trước ngày 21/03/2023
 
-> Các thư viện bên ngoài :
+Các thư viện bên ngoài :
 - documents4j v1.1.10 và itextpdf v5.5.10
     - Dùng để chuyển file docx thành file pdf.
 - apache.poi v5.2.3
