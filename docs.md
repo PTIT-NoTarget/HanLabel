@@ -1,5 +1,17 @@
 # HanLabel
 
+## Ngày 23/03/2023
+Các tính năng đã phát triển thêm :
+- Thay đổi được template cho nhãn vở ( có 3 cái )
+
+Bugs :
+- Click đổi giữa các nhãn chưa mượt lắm
+- Nhãn vở thay thế không hết
+
+Các tính năng sẽ phát triển sắp tới :
+- Hiện PrintPreview
+- Hiện bảng thông báo đang thực hiện chương trình
+
 ## Ngày 22/03/2023
 Các tính năng đã phát triển thêm :
 - In nhãn vở (70%)

@@ -300,7 +300,7 @@ public class Controller {
                     Replaced.add("");
                 }
             }
-            replaceText(someWords, Replaced, "notebook.docx", "output2.docx");
+            replaceText(someWords, Replaced, notePath, "output2.docx");
             inputPaths.add(folderPath + "output2.docx");
         }
         convertDocxToPdf(inputPaths, folderPath + "output.pdf");
@@ -350,6 +350,7 @@ public class Controller {
                     k++;
                     if(tmp == jl){
                         bookPath = "book_" + String.format("%d", k) + ".docx";
+                        notePath = "notebook_" + String.format("%d", k) + ".docx";
                     }
                     tmp.setBorder(defaultBorder);
                 }
