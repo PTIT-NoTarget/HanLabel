@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package proptit.hanlabel.Controller;
 import com.documents4j.api.DocumentType;
 import com.documents4j.api.IConverter;
@@ -56,8 +52,7 @@ import javax.swing.text.DocumentFilter;
 
 public class Controller {
     private static Controller instance;
-    private final String folderPath = "D:\\App\\HanLabel\\target\\";
-    //private final String folderPath = "";
+    private final String folderPath = ".\\target\\";
     private ArrayList<JLabel> jLabels = new ArrayList<>();
     private String bookPath;
     private String notePath;
@@ -232,9 +227,11 @@ public class Controller {
     }
     
     public void printPDFfile(JTextField schoolF, JTextField nameF, JTextField gradeF, JCheckBox book, JCheckBox note, JProgressBar jpb, JTextArea jta) throws IOException, PrinterException, FileNotFoundException, XmlException, DocumentException, InterruptedException{
-        MainView.pushMsg(bookPath);
-        jpb.setStringPainted(true);
-        jpb.setValue(30);
+        jpb.setValue(60);
+        if(bookPath == null || notePath == null){
+            MainView.pushMsg("Bạn chưa chọn loại nhãn vở");
+            return;
+        }
         if(schoolF.getText().equals("")){
             MainView.pushMsg("Vui lòng nhập tên trường.");
             return;
@@ -252,6 +249,7 @@ public class Controller {
             return;
         }
         if(exceptionHandling(schoolF, gradeF) == false) return;
+        MainView.pushMsg("Đang in .... Bấm OK và chờ.");
         prepareDocxFile(schoolF, nameF, gradeF,book, note, jta,jpb);
         String filePath = "output.pdf";
         try (PDDocument pdDocument = PDDocument.load(new File(folderPath + filePath))) {
@@ -261,10 +259,17 @@ public class Controller {
             if (printerJob.printDialog()) {
                 for (int i = 0; i < pdDocument.getNumberOfPages(); i++) {
                     printerJob.setPageable(new PDFPageable(pdDocument));
-                    printerJob.print();
                 }
+                printerJob.print();
             }
         }
+        MainView.pushMsg("Đã xong.");
+        jpb.setValue(0);
+        nameF.setText("");
+        schoolF.setText("");
+        gradeF.setText("");
+        book.setSelected(false);
+        note.setSelected(false);
     }
     
     public String ChuanHoaXau(String s){
@@ -358,5 +363,13 @@ public class Controller {
             }
         });
         jLabels.add(jl);
+    }
+    
+    public void setLogo(JLabel jl){
+        ImageIcon img = new ImageIcon(folderPath + "logo" + ".png");
+        Image image = img.getImage();
+        Image scaledImage = image.getScaledInstance(jl.getWidth(), jl.getHeight(), Image.SCALE_SMOOTH);
+        ImageIcon scaledIcon = new ImageIcon(scaledImage);
+        jl.setIcon(scaledIcon);
     }
 }
