@@ -1,5 +1,5 @@
 pipeline {
-    agent {label "FCIM_CLOUD"}
+    agent {label "hanlabel"}
     stages{
         stage("Check old image") {
             steps {
