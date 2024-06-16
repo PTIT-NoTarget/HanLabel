@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  fcim_cloud_mdm_fe:
+  frontend:
     container_name: hanlabel-fe
     build:
       dockerfile: Dockerfile
