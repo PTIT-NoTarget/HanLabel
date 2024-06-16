@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  fcim_cloud_mdm_fe:
+    container_name: hanlabel-fe
+    build:
+      dockerfile: Dockerfile
+    image: hanlabel-fe
+    restart: always
+    ports:
+      - "8080:80"
