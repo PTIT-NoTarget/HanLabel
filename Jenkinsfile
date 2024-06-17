@@ -1,21 +1,15 @@
 pipeline {
-    agent {label 'hanlabel'}
-    stages {
-        stage('Clean up old containers and images') {
+    agent {label "hanlabel"}
+    stages{
+        stage("Check old image") {
             steps {
-                script {
-                    try {
-                        sh 'docker rm -f hanlabel-fe || true'
-                        sh 'docker image rm -f hanlabel-fe || true'
-                    } catch (Exception e) {
-                        echo 'No old containers or images to remove'
-                    }
-                }
+                sh 'docker rm -f hanlabel-fe || echo "this container does not exist" '
+                sh 'docker image rm -f  hanlabel-fe || echo "this image dose not exist" '
             }
         }
         stage('Build and Run') {
             steps {
-                sh 'docker-compose up -d --build'
+                sh 'docker compose up -d --build'
             }
         }
         stage('Cleanup unused data') {
