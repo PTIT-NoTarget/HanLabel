@@ -3,16 +3,16 @@ pipeline {
     environment {
         REACT_APP_ENV = 'cicd'
     }
-    stages{
+    stages {
         stage("Check old image") {
             steps {
-                sh 'docker rm -f hanlabel-fe || echo "this container does not exist" '
-                sh 'docker image rm -f  hanlabel-fe || echo "this image dose not exist" '
+                sh 'docker rm -f hanlabel-fe || echo "this container does not exist"'
+                sh 'docker image rm -f hanlabel-fe || echo "this image does not exist"'
             }
         }
         stage('Build and Run') {
             steps {
-                sh 'export REACT_APP_ENV=${REACT_APP_ENV} && docker compose up -d --build'
+                sh 'docker compose up -d --build'
             }
         }
         stage('Cleanup unused data') {
