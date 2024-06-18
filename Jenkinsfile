@@ -12,7 +12,7 @@ pipeline {
         }
         stage('Build and Run') {
             steps {
-                sh 'docker compose up -d --build'
+                sh 'export REACT_APP_ENV=${REACT_APP_ENV} && docker compose up -d --build'
             }
         }
         stage('Cleanup unused data') {
