@@ -2,6 +2,8 @@ version: "3.8"
 services:
   frontend:
     container_name: hanlabel-fe
+    environment:
+      - ENV=${ENV}
     build:
       dockerfile: Dockerfile
     image: hanlabel-fe
