@@ -1,5 +1,8 @@
 pipeline {
-    agent {label "hanlabel"}
+    agent {label "fn"}
+    environment {
+        ENV = 'cicd'
+    }
     stages{
         stage("Check old image") {
             steps {
