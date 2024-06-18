@@ -5,7 +5,10 @@ services:
     environment:
       - REACT_APP_ENV=${REACT_APP_ENV}
     build:
+      context: .
       dockerfile: Dockerfile
+      args:
+        - REACT_APP_ENV=${REACT_APP_ENV}
     image: hanlabel-fe
     restart: always
     ports:
