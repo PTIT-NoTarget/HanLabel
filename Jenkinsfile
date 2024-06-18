@@ -1,7 +1,7 @@
 pipeline {
     agent {label "fn"}
     environment {
-        ENV = 'cicd'
+        REACT_APP_ENV = 'cicd'
     }
     stages{
         stage("Check old image") {

@@ -1,16 +1,15 @@
 import axios from "axios"
-import constant from "../utils/Constants"
 
 export const addNewBackground = (background: any) => {
   const formData = new FormData();
   for (const key in background) {
     formData.append(key, background[key]);
   }
-  return axios.post(`${constant.API_URL}/background`, formData)
+  return axios.post(`${process.env.API_URL}/background`, formData)
 }
 
 export const getAllBackgrounds = () => {
-  return axios.get(`${constant.API_URL}/background`)
+  return axios.get(`${process.env.API_URL}/background`)
 }
 
 export const updateBackground = (backgroundId: any, background: any) => {
@@ -18,9 +17,9 @@ export const updateBackground = (backgroundId: any, background: any) => {
   for (const key in background) {
     formData.append(key, background[key]);
   }
-  return axios.put(`${constant.API_URL}/background/${backgroundId}`, formData)
+  return axios.put(`${process.env.API_URL}/background/${backgroundId}`, formData)
 }
 
 export const deleteBackground = (backgroundId: any) => {
-  return axios.delete(`${constant.API_URL}/background/${backgroundId}`)
+  return axios.delete(`${process.env.API_URL}/background/${backgroundId}`)
 }

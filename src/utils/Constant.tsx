@@ -1,1 +1,0 @@
-export const API_URL = "http://api.notarget.id.vn";

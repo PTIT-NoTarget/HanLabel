@@ -62,6 +62,7 @@ export default function SchoolAction() {
   };
 
   const addSubmit = (name: any) => {
+    console.log(name);
     addNewSchool(name)
       .then((res) => {
         let newSchools = [...schools];
