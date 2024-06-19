@@ -4,8 +4,7 @@ services:
     container_name: hanlabel-fe
     environment:
       - REACT_APP_ENV=${REACT_APP_ENV}
-    build:
-      context: .
+    build:.
       dockerfile: Dockerfile
       args:
         - REACT_APP_ENV=${REACT_APP_ENV}

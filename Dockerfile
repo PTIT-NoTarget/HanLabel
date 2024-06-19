@@ -4,6 +4,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
 COPY . ./
+ARG REACT_APP_ENV
 RUN if [ "$REACT_APP_ENV" = "cicd" ]; then npm run build:cicd; else npm run build; fi
 
 # Stage 2 - the production environment
