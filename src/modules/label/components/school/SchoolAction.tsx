@@ -62,8 +62,10 @@ export default function SchoolAction() {
   };
 
   const addSubmit = (name: any) => {
-    console.log(name);
-    addNewSchool(name)
+    let newSchool = {
+      name: name,
+    };
+    addNewSchool(newSchool)
       .then((res) => {
         let newSchools = [...schools];
         newSchools.push({
@@ -81,7 +83,10 @@ export default function SchoolAction() {
   };
 
   const updateSubmit = (name: any) => {
-    updateSchool(rowSelected, name)
+    let newSchool = {
+      name: name,
+    };
+    updateSchool(rowSelected, newSchool)
       .then((res) => {
         let newSchools = [...schools];
         newSchools[rowSelected - 1].name = name;
