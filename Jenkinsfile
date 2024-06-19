@@ -15,10 +15,5 @@ pipeline {
                 sh 'docker compose up -d --build'
             }
         }
-        stage('Cleanup unused data') {
-            steps {
-                sh 'docker system prune -f'
-            }
-        }
     }
 }
