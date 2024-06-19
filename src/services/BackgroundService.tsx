@@ -5,11 +5,11 @@ export const addNewBackground = (background: any) => {
   for (const key in background) {
     formData.append(key, background[key]);
   }
-  return axios.post(`${process.env.API_URL}/background`, formData)
+  return axios.post(`${process.env.REACT_APP_API_URL}/background`, formData)
 }
 
 export const getAllBackgrounds = () => {
-  return axios.get(`${process.env.API_URL}/background`)
+  return axios.get(`${process.env.REACT_APP_API_URL}/background`)
 }
 
 export const updateBackground = (backgroundId: any, background: any) => {
@@ -17,9 +17,9 @@ export const updateBackground = (backgroundId: any, background: any) => {
   for (const key in background) {
     formData.append(key, background[key]);
   }
-  return axios.put(`${process.env.API_URL}/background/${backgroundId}`, formData)
+  return axios.put(`${process.env.REACT_APP_API_URL}/background/${backgroundId}`, formData)
 }
 
 export const deleteBackground = (backgroundId: any) => {
-  return axios.delete(`${process.env.API_URL}/background/${backgroundId}`)
+  return axios.delete(`${process.env.REACT_APP_API_URL}/background/${backgroundId}`)
 }
